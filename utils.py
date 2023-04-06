@@ -61,13 +61,13 @@ def move_file(weather):
     current_file = os.listdir("./playing")[0]
     current_weather = current_file.split('.')[0]
 
-    file_format = ".mp4"
-    
+    # file_format = ".mp4"
+    file_format = ".h264"
     
     # if our current weather is the same as the weather being passed in,
     # just leave it be and do nothing. Wait for next call.
     if current_weather == weather:
-        print(f'no need to change - weather is still {weather}')
+        # print(f'no need to change - weather is still {weather}')
         pass
     else:
         # move the file back into the 'videos' folder.
