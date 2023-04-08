@@ -16,8 +16,13 @@ def get_weather(debug):
     """
     # get zip code and API key from .env file.
     # if running locally and not distributing, you can just set them here.
+    # ZIP = '01234'
+    # API_KEY = '123456789'
     # you can grab an API key from open weather here:
     # https://home.openweathermap.org/users/sign_up
+
+    # If you are just running this locally and don't need .env,
+    # just comment these three lines out.
     load_dotenv()
     ZIP = os.getenv('ZIP')
     API_KEY = os.getenv('API_KEY')
@@ -58,8 +63,28 @@ def get_weather(debug):
         return 'normal'
     
 def move_file(weather):
-    current_file = os.listdir("./playing")[0]
+    """
+    This function swaps the old weather video file into the videos folder
+    and moves the new weather video file into the playing folder.
+    
+    :param weather: the current weather from get_weather().
+    """
+    # Scheduling work using crontab in linux means that the file path
+    # will not be as simple as /playing or /videos. set absolute paths
+    # independent of where move_file is called to ensure it finds folders.
+    path_debug = False
+
+    main_path = os.path.dirname(os.path.realpath(__file__))
+    playing_path = os.path.join(main_path, "playing")
+    video_path = os.path.join(main_path, "videos")
+    current_file = os.listdir(playing_path)[0]
     current_weather = current_file.split('.')[0]
+
+    if path_debug:
+        print(f'===PATH DEBUG===\nmain_path: {main_path}')
+        print(f'playing path: {playing_path}')
+        print(f'video path: {video_path}')
+        print(f'current file: {current_file}')
 
     # file_format = ".mp4"
     file_format = ".h264"
@@ -70,17 +95,22 @@ def move_file(weather):
         # print(f'no need to change - weather is still {weather}')
         pass
     else:
+        print(f'changing weather from {current_weather} to {weather}')
         # move the file back into the 'videos' folder.
-        source = f"./playing/{current_file}"
-        destination = "./videos"
-        # print(source)
+        source = os.path.join(playing_path, current_file)
+        destination = video_path
         shutil.move(source, destination)
 
         # pick new video from 'videos'
         new_video = f'{weather}{file_format}'
-        new_source = f"./videos/{new_video}"
-        # print(new_video, new_source)
+        new_source = os.path.join(video_path, new_video)
         
         # move video from videos --> playing
-        new_destination = "./playing"
+        new_destination = playing_path
         shutil.move(new_source, new_destination)
+
+        if path_debug:
+            print(f'source: {source}')
+            print(f'destination: {destination}')
+            print(f'new video source: {new_source}')
+            print(f'new destination = {new_destination}')
